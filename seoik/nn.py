@@ -71,7 +71,13 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         self.dropout = dropout
         self.epochs = epochs
         self.model = DynamicANN(input_dim, layers, activations, dropout)
-        self.batch_size = batch_size  # 추가됨
+        
+        #gpu사용위해 추가된 부분
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # device 설정
+        self.model = self.model.to(self.device) # 모델을 device에 올림
+        #gpu사용위해 추가된 부분
+
+        self.batch_size = batch_size  
         self.criterion = criterion
         self.lr = lr
 
@@ -81,17 +87,22 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         assert input_dim == self.input_dim, "Input dimension mismatch"
 
         X_tensor = torch.tensor(X)
+
+        #gpu사용위해 추가된 부분
+        X_tensor = X_tensor.to(self.device) # 데이터를 device에 올림
+        #gpu사용위해 추가된 부분
+
         # y_tensor = torch.tensor(y, dtype=torch.float32).view(-1, 1)
         # y_tensor = torch.tensor(y, dtype=torch.long).view(-1, 1)
         y_tensor = torch.tensor(y, dtype=torch.long)
 
         # 여기서 주목해야 할 부분은 dtype=torch.float32입니다. 다중 클래스 분류 문제의 경우 CrossEntropyLoss를 사용하므로 y가 정수형이어야 합니다.
-        # 따라서 dtype=torch.long으로 변경해야 합니다. 아래는 수정된 코드입니다:
+        # 따라서 dtype=torch.long으로 변경해야 합니다
 
         # criterion = nn.MSELoss()
         # criterion = nn.CrossEntropyLoss()
         criterion = eval(self.criterion)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         
         train_dataset = TensorDataset(X_tensor, y_tensor)
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
@@ -102,6 +113,11 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
             total_loss = 0.0
 
             for batch_data, batch_target in (train_loader):
+
+                #gpu사용위해 추가된 부분
+                batch_data, batch_target = batch_data.to(self.device), batch_target.to(self.device) # 데이터를 device에 올림
+                #gpu사용위해 추가된 부분
+
                 optimizer.zero_grad()
                 outputs = self.model(batch_data)
                 loss = criterion(outputs, batch_target)
@@ -112,7 +128,7 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
 
             average_loss = total_loss / len(train_loader)
             print(f'Epoch {epoch + 1}/{self.epochs}, Average Training Loss: {average_loss:.4f}')
-            
+
         self.is_fitted_= True 
     
     def predict(self, X):
@@ -120,15 +136,21 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         ##
         X = check_array(X, dtype='float32', force_all_finite=False)
 
-        # Convert numpy array to PyTorch tensor
         X_tensor = torch.tensor(X)
 
         
-        # Make predictions
         self.model.eval()
         with torch.no_grad():
-            predictions = self.model(X_tensor).numpy()
+            #predictions = self.model(X_tensor).numpy()
+            #gpu사용위해 생략
 
+            #gpu사용위해 추가된 부분
+            predictions = self.model(X_tensor).cpu().numpy() #예측결과 cpu로 가져옴
+            #gpu사용위해 추가된 부분 
+
+        ######### 여기가 원래 없는 코드인데 이거 numpy배열에서 확률로 설정된 float값을 리턴한다. 그래서 우리가 원하는 클래스 값으로 변환해야함
+        predictions = np.argmax(predictions, axis=1) #이거 리턴값 예측값을 찍어보면 확률로 나옴
+        ########이 부분이 핵심임 다른 모델 만들때는 다르게 리턴해줘야함
         return predictions
     
     def score(self, X, y):
