@@ -26,13 +26,8 @@ class DynamicANN(nn.Module):
     def forward(self, x):
         for i, layer in enumerate(self.layers):
             x = layer(x)
-
-            # if i < len(self.activations):
-            #     if self.activations[i] == 'relu':
-            #         x = nn.functional.relu(x)
-            #     elif self.activations[i] == 'sigmoid':
-            #         x = nn.functional.sigmoid(x)
-            #             activation = self.activations[i]
+            # x = self.dropout(x)
+            # 드롭아웃은 각 히든 레이어의 출력 직전에 적용
             # # 모든 활성화 함수 사용가능하게끔 추가
             if i < len(self.activations):
                 activation = self.activations[i]
@@ -60,7 +55,6 @@ class DynamicANN(nn.Module):
                     x = nn.functional.softsign(x)
                 elif activation == 'softmin':
                     x = nn.functional.softmin(x)
-            # x = self.dropout(x)
         return x
 
 class DynamicANNWrapper(BaseEstimator, RegressorMixin):
