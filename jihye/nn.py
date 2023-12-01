@@ -6,10 +6,10 @@ from tqdm.auto import tqdm
 from torch.utils.data import TensorDataset
 
 class ANN(nn.Module):
-  def __init__(self, input_dim=107, hidden_dim=256, p=0.3):
+  def __init__(self, input_dim=102, hidden_dim=256, p=0.2):
     super().__init__()
     self.lin1 = nn.Linear(input_dim,hidden_dim)
-    self.lin2 = nn.Linear(input_dim,hidden_dim)
+    self.lin2 = nn.Linear(hidden_dim,hidden_dim)
     self.lin3 = nn.Linear(hidden_dim,3)
     self.dropout = nn.Dropout(p)
   def forward(self, x):
@@ -20,7 +20,6 @@ class ANN(nn.Module):
     x = nn.functional.relu(x)
     x = self.dropout(x)
     x = self.lin3(x)
-    x = nn.functional.softmax(x, dim=1)
     return x
   
 class ANN_Estimator(ANN, BaseEstimator):

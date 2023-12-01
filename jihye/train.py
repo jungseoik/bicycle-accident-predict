@@ -27,9 +27,9 @@ def train_one_epoch(
     X, y = X.to(device), y.to(device)
     output = model(X)
     loss = criterion(output, y)
-    optimizer.zero_grad()
     loss.backward()
     optimizer.step()
+    optimizer.zero_grad()
     total_loss += loss.item() * len(y)
   return total_loss/len(data_loader.dataset)
 '''
@@ -75,7 +75,6 @@ def main(args):
   y = get_y(train_df)[:,np.newaxis]
 
   X_trn, X_test, y_trn, y_test = split(X,y)
-  X_trn, X_test, y_trn, y_test = torch.tensor(X_trn),torch.tensor(X_test),torch.tensor(y_trn),torch.tensor(y_test)
 
   #size 찍어보기
   print(X_trn.shape,y_trn.shape , X_trn.dtype, y_trn.dtype)
@@ -101,7 +100,7 @@ def get_args_parser(add_help=True):
 
   parser = argparse.ArgumentParser(description="PyTorch Classification Training", add_help=add_help)
 
-  parser.add_argument("--data-train", default="./data/processed.csv", type=str, help="train dataset path")
+  parser.add_argument("--data-train", default="./data/final.csv", type=str, help="train dataset path")
   # parser.add_argument("--data-test", default="./data/test.csv", type=str, help="test dataset path")
   parser.add_argument("--hidden-dim", default=128, type=int, help="dimension of hidden layer")
   parser.add_argument("--device", default="cpu", type=str, help="device (Use cpu/cuda/mps)")
