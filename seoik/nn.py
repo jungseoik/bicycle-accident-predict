@@ -96,7 +96,6 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
 
         # criterion = nn.MSELoss()
         # criterion = nn.CrossEntropyLoss()
-
         criterion = eval(self.criterion)
         # optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         if self.optimizer == "Adam":
@@ -131,6 +130,7 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
                 total_loss += loss.item()
 
             average_loss = total_loss / len(train_loader)
+            # average_loss = total_loss / len(train_loader.dataset)
             print(f'Epoch {epoch + 1}/{self.epochs}, Average Training Loss: {average_loss:.4f}')
 
         self.is_fitted_= True 
