@@ -1,20 +1,27 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
 
 def get(filepath):
     df = pd.read_csv(filepath)
 
     train_df, test_df = train_test_split(df, test_size=0.2, random_state=2023)
-    train_df, val_df = train_test_split(train_df, test_size=0.2, random_state=2023)
+    # train_df, val_df = train_test_split(train_df, test_size=0.2, random_state=2023)
 
     X_trn = train_df.drop('타겟',axis=1).values
     y_trn = train_df['타겟'].values
     X_tst = test_df.drop('타겟',axis=1).values
     y_tst = test_df['타겟'].values
-    X_val = val_df.drop('타겟',axis=1).values
-    y_val = val_df['타겟'].values   
+    # X_val = val_df.drop('타겟',axis=1).values
+    # y_val = val_df['타겟'].values   
 
-    return X_trn, y_trn, X_tst, y_tst, X_val, y_val
+    smote = SMOTE(sampling_strategy='auto', random_state=0)
+
+    # 오버샘플링 적용
+    X_trn, y_trn = smote.fit_resample(X_trn, y_trn) #판다스데이터타입도 넘파이로변환하는게 아니라 판다스로 리턴해줌
+
+
+    return X_trn, y_trn, X_tst, y_tst, #X_val, y_val
 
 # 사용 예시
 # X_trn, y_trn, X_tst, y_tst, X_val, y_val = get('prepro_jung.csv')

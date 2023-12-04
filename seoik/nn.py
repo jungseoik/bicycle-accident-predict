@@ -58,7 +58,7 @@ class DynamicANN(nn.Module):
         return x
 
 class DynamicANNWrapper(BaseEstimator, RegressorMixin):
-    def __init__(self, input_dim, layers, activations, dropout, epochs=10 ,  batch_size=32 , criterion="nn.CrossEntropyLoss()" , lr=0.001):
+    def __init__(self, input_dim, layers, activations, dropout, epochs=10 ,  batch_size=32 , criterion="nn.CrossEntropyLoss()" , lr=0.001, optimizer="Adam"):
         self.input_dim = input_dim
         self.layers = layers
         self.activations = activations
@@ -71,6 +71,7 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         self.model = self.model.to(self.device) # 모델을 device에 올림
         #gpu사용위해 추가된 부분
 
+        self.optimizer = optimizer
         self.batch_size = batch_size  
         self.criterion = criterion
         self.lr = lr
@@ -95,8 +96,17 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
 
         # criterion = nn.MSELoss()
         # criterion = nn.CrossEntropyLoss()
+
         criterion = eval(self.criterion)
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        # optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        if self.optimizer == "Adam":
+            optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        elif self.optimizer == "SGD":
+            optimizer = torch.optim.SGD(self.model.parameters(), lr=self.lr)
+        elif self.optimizer == "RMSprop":
+            optimizer = torch.optim.RMSprop(self.model.parameters(), lr=self.lr)
+        else:
+            raise ValueError("Invalid optimizer. Expected one of: 'Adam', 'SGD', 'RMSprop'")
         
         train_dataset = TensorDataset(X_tensor, y_tensor)
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
@@ -131,7 +141,7 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         X = check_array(X, dtype='float32', force_all_finite=False)
 
         X_tensor = torch.tensor(X)
-
+        X_tensor = X_tensor.to(self.device)
         
         self.model.eval()
         with torch.no_grad():

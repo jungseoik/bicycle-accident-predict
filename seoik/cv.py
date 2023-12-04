@@ -12,7 +12,7 @@ import torchmetrics
 from copy import deepcopy
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
+from sklearn.metrics import confusion_matrix
 
 def CV(model, feature, label, n_splits=5):
     kfold = KFold(n_splits=n_splits, shuffle=True, random_state=42)
@@ -38,6 +38,9 @@ def CV(model, feature, label, n_splits=5):
         net.fit(x_train, y_train)
 
         pred = net.predict(x_test)
+
+        cm = confusion_matrix(y_test, pred)
+        print(f'\n#{i+1} Confusion Matrix: \n{cm}')
         
         try:
             accuracy = accuracy_score(y_test, pred)
