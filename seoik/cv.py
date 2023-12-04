@@ -1,5 +1,3 @@
-
-
 from tqdm.auto import tqdm
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold, KFold
@@ -10,13 +8,16 @@ from torchmetrics.regression import MeanAbsoluteError, MeanSquaredError
 from typing import Optional, List
 import torchmetrics
 from copy import deepcopy
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.metrics import confusion_matrix
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+import torch
 
 def CV(model, feature, label, n_splits=5):
     kfold = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     model_performance = []
+
+
+    patience=5 #얼리스탑핑 용
 
     print(f"\n=== {model.__class__.__name__} ===")
     performance_metrics = {
@@ -25,11 +26,21 @@ def CV(model, feature, label, n_splits=5):
         'accuracy': [],
         'precision': [],
         'recall': [],
-        'f1': []
+        'f1': [],
+
+        ##추가한 부분
+        'confusion_matrix': [],
+        'early_stopping_epoch': []
+        ##추가한 부분
     }
 
     nets = [deepcopy(model) for _ in range(n_splits)]
-    
+
+    ##얼리스탑핑 위해 추가한부분
+    best_loss = np.inf
+    no_improve_count = 0
+    ##얼리스탑핑 위해 추가한부분
+
     for i, (train_index, test_index) in enumerate(kfold.split(feature, label)):
         x_train, x_test = feature[train_index], feature[test_index]
         y_train, y_test = label[train_index], label[test_index]
@@ -39,9 +50,12 @@ def CV(model, feature, label, n_splits=5):
 
         pred = net.predict(x_test)
 
+        ##혼동행렬 위해 추가
         cm = confusion_matrix(y_test, pred)
         print(f'\n#{i+1} Confusion Matrix: \n{cm}')
-        
+        performance_metrics['confusion_matrix'].append(cm)
+        ##혼동행렬 위해 추가
+
         try:
             accuracy = accuracy_score(y_test, pred)
             precision = precision_score(y_test, pred, average='macro')
@@ -58,13 +72,31 @@ def CV(model, feature, label, n_splits=5):
         performance_metrics['precision'].append(precision)
         performance_metrics['recall'].append(recall)
         performance_metrics['f1'].append(f1)
+        
+        # Early stopping 추가한부분
+        loss = 1 - accuracy  # assuming you want to minimize error = 1 - accuracy
+        if loss < best_loss:
+            best_loss = loss
+            no_improve_count = 0
+        else:
+            no_improve_count += 1
+            if no_improve_count >= patience:
+                print("Early stopping at epoch:", i+1)
+                performance_metrics['early_stopping_epoch'].append(i+1)
+                break
+        # Early stopping 추가한부분
     i=0
+
     avg_performance = {
         'Model': performance_metrics['Model'] + str(i),
         'Avg Accuracy': np.mean(performance_metrics['accuracy']),
         'Avg Precision': np.mean(performance_metrics['precision']),
         'Avg Recall': np.mean(performance_metrics['recall']),
-        'Avg F1': np.mean(performance_metrics['f1'])
+        'Avg F1': np.mean(performance_metrics['f1']),
+    
+        ##추가한 부분
+        'Avg Confusion Matrix': np.mean(performance_metrics['confusion_matrix'], axis=0).astype(int),
+        'Avg Early Stopping Epoch': np.mean(performance_metrics['early_stopping_epoch'])
     }
     model_performance.append(avg_performance)
     i+=1
@@ -73,6 +105,12 @@ def CV(model, feature, label, n_splits=5):
     print('## 평균 검증 Precision:', np.mean(performance_metrics['precision']))
     print('## 평균 검증 Recall:', np.mean(performance_metrics['recall']))
     print('## 평균 검증 F1:', np.mean(performance_metrics['f1']))
+
+    ##추가한 부분
+    print('## 평균 confusion_matrix:',  np.mean(performance_metrics['confusion_matrix'], axis=0).astype(int))
+    print('## 평균 early_stopping_epoch:', np.mean(performance_metrics['early_stopping_epoch']))
+    ##추가한 부분
+
 
     df_performance = pd.DataFrame(model_performance)
     return df_performance
