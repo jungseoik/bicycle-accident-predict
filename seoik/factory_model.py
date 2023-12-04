@@ -11,7 +11,7 @@ import os
 # 현재 작업 디렉토리 가져오기
 
 
-def factory_model(jsonstr):
+def factory_model(feature, labelk, jsonstr):
     # 설정 파일 로드
     current_dir = os.getcwd()
     current_dir = os.path.join(current_dir, "HyperParameters")
@@ -31,10 +31,11 @@ def factory_model(jsonstr):
     epochs = config['epochs']
     batch_size = config['batch_size']
     criterion = config['criterion']
+    optimizer= config['optimizer']
     ##############################################위에가 json에서 데이터 받는 부분
 
     # 모델 생성
-    model_wrapper = DynamicANNWrapper(input_dim, layers, activations, dropout ,epochs, batch_size, criterion , lr)
+    model_wrapper = DynamicANNWrapper(input_dim, layers, activations, dropout ,epochs, batch_size, criterion , lr , optimizer)
 
 
     model = model_wrapper
