@@ -63,7 +63,7 @@ def evaluate(
 def main(args):
   import numpy as np
   import pandas as pd
-  from preprocess import get_X, get_y, split
+  from preprocess import get_X, get_y, split2
   from nn import ANN
   from torch.utils.data import TensorDataset, DataLoader
   from tqdm.auto import tqdm
@@ -74,12 +74,17 @@ def main(args):
   X = get_X(train_df)
   y = get_y(train_df)[:,np.newaxis]
 
-  X_trn, X_test, y_trn, y_test = split(X,y)
+  X_trn, X_test, y_trn, y_test = split2(X,y)
+  # x_trn이 NumPy 배열이므로
+  #X_trn_tensor = torch.tensor(X_trn)
+  X_trn_tensor = torch.from_numpy(X_trn)
+  # y_trn이 NumPy 배열일 경우
+  y_trn_tensor = torch.from_numpy(y_trn).squeeze().long()
 
   #size 찍어보기
   print(X_trn.shape,y_trn.shape , X_trn.dtype, y_trn.dtype)
 
-  ds = TensorDataset(X_trn, y_trn.squeeze().to(torch.long))
+  ds = TensorDataset(X_trn_tensor, y_trn_tensor.squeeze().to(torch.long))
   dl = DataLoader(ds, batch_size=args.batch_size, shuffle=args.do_shuffle)
 
   model = ANN(X_trn.shape[-1], args.hidden_dim).to(device)
