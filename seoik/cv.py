@@ -29,16 +29,16 @@ def CV(model, feature, label, n_splits=5):
         'f1': [],
 
         ##추가한 부분
-        'confusion_matrix': [],
-        'early_stopping_epoch': []
+        'confusion_matrix': []
+        # 'early_stopping_epoch': []
         ##추가한 부분
     }
 
     nets = [deepcopy(model) for _ in range(n_splits)]
 
     ##얼리스탑핑 위해 추가한부분
-    best_loss = np.inf
-    no_improve_count = 0
+    # best_loss = np.inf
+    # no_improve_count = 0
     ##얼리스탑핑 위해 추가한부분
 
     for i, (train_index, test_index) in enumerate(kfold.split(feature, label)):
@@ -74,16 +74,16 @@ def CV(model, feature, label, n_splits=5):
         performance_metrics['f1'].append(f1)
         
         # Early stopping 추가한부분
-        loss = 1 - accuracy  # assuming you want to minimize error = 1 - accuracy
-        if loss < best_loss:
-            best_loss = loss
-            no_improve_count = 0
-        else:
-            no_improve_count += 1
-            if no_improve_count >= patience:
-                print("Early stopping at epoch:", i+1)
-                performance_metrics['early_stopping_epoch'].append(i+1)
-                break
+        # loss = 1 - accuracy  # assuming you want to minimize error = 1 - accuracy
+        # if loss < best_loss:
+        #     best_loss = loss
+        #     no_improve_count = 0
+        # else:
+        #     no_improve_count += 1
+        #     if no_improve_count >= patience:
+        #         print("Early stopping at epoch:", i+1)
+        #         performance_metrics['early_stopping_epoch'].append(i+1)
+        #         break
         # Early stopping 추가한부분
     i=0
 
@@ -95,8 +95,15 @@ def CV(model, feature, label, n_splits=5):
         'Avg F1': np.mean(performance_metrics['f1']),
     
         ##추가한 부분
-        'Avg Confusion Matrix': np.mean(performance_metrics['confusion_matrix'], axis=0).astype(int),
-        'Avg Early Stopping Epoch': np.mean(performance_metrics['early_stopping_epoch'])
+        'Avg Confusion Matrix': np.mean(performance_metrics['confusion_matrix'], axis=0).astype(int)
+        
+        # 'Avg Early Stopping Epoch': np.mean(performance_metrics['early_stopping_epoch'])
+
+        #오버피팅이 일어나서 오버피팅이 일어난걸 개선하겠다라는 목적성이 있으면 적합하다
+        #오버피팅이 일어난다는건 파이프라인이 제대로 돌아가고 학습이 잘 돌아가고 있다 라는걸 확인한 후
+        #나머지 하이퍼 파라미터 다 사용해봤는데 오버피팅을 못잡으면 얼리스탑핑을 사용한다.
+
+        #오버피팅 -> 모델파라미터가 너무 많을때 발생한다.
     }
     model_performance.append(avg_performance)
     i+=1
@@ -108,9 +115,8 @@ def CV(model, feature, label, n_splits=5):
 
     ##추가한 부분
     print('## 평균 confusion_matrix:',  np.mean(performance_metrics['confusion_matrix'], axis=0).astype(int))
-    print('## 평균 early_stopping_epoch:', np.mean(performance_metrics['early_stopping_epoch']))
+    # print('## 평균 early_stopping_epoch:', np.mean(performance_metrics['early_stopping_epoch']))
     ##추가한 부분
-
 
     df_performance = pd.DataFrame(model_performance)
     return df_performance

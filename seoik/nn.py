@@ -9,6 +9,8 @@ from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+
 
 class DynamicANN(nn.Module):
     def __init__(self, input_dim, layers, activations, dropout):
@@ -26,7 +28,7 @@ class DynamicANN(nn.Module):
     def forward(self, x):
         for i, layer in enumerate(self.layers):
             x = layer(x)
-            # x = self.dropout(x)
+            x = self.dropout(x)
             # 드롭아웃은 각 히든 레이어의 출력 직전에 적용
             # # 모든 활성화 함수 사용가능하게끔 추가
             if i < len(self.activations):
@@ -86,10 +88,14 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         #gpu사용위해 추가된 부분
         X_tensor = X_tensor.to(self.device) # 데이터를 device에 올림
         #gpu사용위해 추가된 부분
-
+        
+        #회귀문제일경우 사용해야한다
         # y_tensor = torch.tensor(y, dtype=torch.float32).view(-1, 1)
-        # y_tensor = torch.tensor(y, dtype=torch.long).view(-1, 1)
+        #회귀문제일경우 사용해야한다
+        
+        #다중클래스면 사용해야하는 부분
         y_tensor = torch.tensor(y, dtype=torch.long)
+        ##다중클래스면 사용해야하는부분
 
         # 여기서 주목해야 할 부분은 dtype=torch.float32입니다. 다중 클래스 분류 문제의 경우 CrossEntropyLoss를 사용하므로 y가 정수형이어야 합니다.
         # 따라서 dtype=torch.long으로 변경해야 합니다
@@ -110,6 +116,10 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         train_dataset = TensorDataset(X_tensor, y_tensor)
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
 
+        # 시각화 위함
+        # self.losses = []
+        # 시각화 위함
+
         for epoch in tqdm(range(self.epochs)):
             self.model.train()
 
@@ -129,12 +139,26 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
 
                 total_loss += loss.item()
 
+            ##뭘로 나누느냐에 따라 값이 다름
             average_loss = total_loss / len(train_loader)
             # average_loss = total_loss / len(train_loader.dataset)
+            
+            ##시각화
+            # self.losses.append(average_loss)
+            ##시각화파트
+
             print(f'Epoch {epoch + 1}/{self.epochs}, Average Training Loss: {average_loss:.4f}')
 
         self.is_fitted_= True 
-    
+
+        #시각화 파트
+        # plt.plot(self.losses)
+        # plt.title('Training Loss Curve')
+        # plt.xlabel('Epoch')
+        # plt.ylabel('Loss')
+        # plt.show()
+        ##시각화 파트
+
     def predict(self, X):
         check_is_fitted(self)
         ##
@@ -145,6 +169,7 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         
         self.model.eval()
         with torch.no_grad():
+            
             #predictions = self.model(X_tensor).numpy()
             #gpu사용위해 생략
 
@@ -157,16 +182,3 @@ class DynamicANNWrapper(BaseEstimator, RegressorMixin):
         ########이 부분이 핵심임 다른 모델 만들때는 다르게 리턴해줘야함
         return predictions
     
-    def score(self, X, y):
-
-        X_tensor = torch.tensor(X, dtype=torch.float32)
-        y_true = torch.tensor(y, dtype=torch.float32).view(-1,1)
-
-        self.model.eval()
-
-        with torch.no_grad():
-            y_prd = self.model(X_tensor).argmax(dim=1).numpy()
-        
-        y_prd = self.predict(X_tensor)
-        
-        return accuracy_score(y_true , y_prd)
