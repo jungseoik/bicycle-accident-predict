@@ -146,7 +146,7 @@ def kfold_cross_validate(model: nn.Module, criterion:callable, device:str, X_trn
   history.append(average_metrics)
   metrics_df = pd.DataFrame(history)
   # Save the metrics to a CSV file
-  metrics_df.to_csv("metrics.csv", index=False)
+  metrics_df.to_csv("metrics2.csv", index=False)
 
 
 '''
