@@ -9,15 +9,103 @@ from typing import Optional, List
 import torchmetrics
 from copy import deepcopy
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import multilabel_confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+
+def evaluate(
+  model:nn.Module,
+  criterion:callable,
+  data_loader:DataLoader,
+  device:str,
+  metric:Optional[torchmetrics.metric.Metric]=None,
+) -> float:
+  '''evaluate
+  
+  Args:
+      model: model
+      criterions: list of criterion functions
+      data_loader: data loader
+      device: device
+  '''
+  model.model.eval()
+  total_loss = 0.
+  true_labels = []
+  pred_labels = []
+  with torch.inference_mode():
+    for X, y in data_loader:
+      X, y = X.to(device), y.to(device)
+      output = model.model(X)
+      total_loss += criterion(output, y).item() * len(y)
+      if metric is not None:
+        metric.update(output, y)
+
+      true_labels.extend(y.cpu().numpy())
+      pred_labels.extend(torch.argmax(output, dim=1).cpu().numpy())
+  
+  accuracy = accuracy_score(true_labels, pred_labels)
+  precision_per_class = precision_score(true_labels, pred_labels, average=None)
+  recall_per_class = recall_score(true_labels, pred_labels, average=None)
+  f1_per_class = f1_score(true_labels, pred_labels, average=None)
+
+  confusion_matrix1 = multilabel_confusion_matrix(true_labels, pred_labels)
+  confusion_matrix2 = confusion_matrix(true_labels, pred_labels)
+
+
+  '''
+  accuracy = accuracy_score(true_labels, pred_labels)
+  precision_per_class = precision_score(true_labels, pred_labels, average='micro')
+  recall_per_class = recall_score(true_labels, pred_labels, average='micro')
+  f1_per_class = f1_score(true_labels, pred_labels, average='micro')
+  confusion_matrix1 = confusion_matrix(true_labels, pred_labels)
+  
+  metrics_df = pd.DataFrame({
+        'Accuracy': [accuracy],
+        'Precision (Class 0)': [precision_per_class],
+        'Recall (Class 0)': [recall_per_class],
+        'F1 Score (Class 0)': [f1_per_class],
+        'Confusion Matrix': [confusion_matrix1]  # Convert to list for DataFrame
+    })
+  
+'''
+
+
+  
+  # Create a DataFrame
+  metrics_df = pd.DataFrame({
+    'Accuracy': [accuracy],
+    'Precision (Class 0)': [precision_per_class[0]],
+    'Precision (Class 1)': [precision_per_class[1]],
+    'Precision (Class 2)': [precision_per_class[2]],
+    'Recall (Class 0)': [recall_per_class[0]],
+    'Recall (Class 1)': [recall_per_class[1]],
+    'Recall (Class 2)': [recall_per_class[2]],
+    'F1 Score (Class 0)': [f1_per_class[0]],
+    'F1 Score (Class 1)': [f1_per_class[1]],
+    'F1 Score (Class 2)': [f1_per_class[2]],
+    'Label Confusion Matrix': [confusion_matrix1],
+    'Confusion Matrix': [confusion_matrix2]
+  })
+  
+
+  # Save to CSV
+  #metrics_df.to_csv('evaluation_metrics.csv', index=False)
+
+  # Print the results
+  #print(metrics_df)
+  #print("Evaluation metrics saved to 'evaluation_metrics.csv'")
+
+  return total_loss/len(data_loader.dataset), metrics_df
+
+
 
 def CV(model, feature, label, n_splits=5):
     kfold = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     model_performance = []
 
 
-    patience=5 #얼리스탑핑 용
+    #patience=5 #얼리스탑핑 용
 
     print(f"\n=== {model.__class__.__name__} ===")
     performance_metrics = {

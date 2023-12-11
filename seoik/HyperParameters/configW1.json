@@ -1,12 +1,22 @@
 
 {
     "input_dim": "feature.shape[1]",
-    "layers": [8, 256, 128, 3],
-    "activations": ["relu","relu","relu", "softmax"],
+    "layers": [512, 256, 128, 3],
+    "activations": ["relu","relu","relu"],
     "dropout": 0.2,
     "lr": 0.001,
-    "epochs": 1,
-    "batch_size": 100,
+    "epochs": 200,
+    "batch_size": 256,
     "criterion" : "nn.CrossEntropyLoss()",
     "optimizer" : "Adam"
 }
+
+#5 교차 검증 Accuracy: 0.7832321405503165, Precision: 0.7807191548343617, Recall: 0.7806318015716652, F1: 0.7767720204841089
+
+## 평균 검증 Accuracy: 0.7740148499882081
+## 평균 검증 Precision: 0.7769116476556012
+## 평균 검증 Recall: 0.7743073801672471
+## 평균 검증 F1: 0.7663248234405791
+## 평균 confusion_matrix: [[2505   24   50]
+ [ 278 1907  395]
+ [ 382  618 1579]]
