@@ -1,0 +1,27 @@
+Accuracy,Precision (Class 0),Precision (Class 1),Precision (Class 2),Recall (Class 0),Recall (Class 1),Recall (Class 2),F1 Score (Class 0),F1 Score (Class 1),F1 Score (Class 2),Label Confusion Matrix,Confusion Matrix
+0.757201646090535,0.8395560040363269,0.7222772277227723,0.33962264150943394,0.928053541550474,0.9130162703379224,0.016574585635359115,0.8815894039735099,0.8065229408512989,0.03160667251975417,
+"[[[3964  318]
+  [ 129 1664]]
+
+ [[1757 1122]
+  [ 278 2918]]
+
+ [[4954   35]
+  [1068   18]]]",
+  
+  
+"[[1664  124    5]
+ [ 248 2918   30]
+ [  70  998   18]]"
+
+{
+    "input_dim": "feature.shape[1]",
+    "layers": [64, 256, 256, 3],
+    "activations": ["relu","relu","relu"],
+    "dropout": 0.1,
+    "lr": 0.0001,
+    "epochs": 250,
+    "batch_size": 256,
+    "criterion" : "nn.CrossEntropyLoss()",
+    "optimizer" : "Adam"
+}

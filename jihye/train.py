@@ -88,9 +88,9 @@ def main(args):
   dl = DataLoader(ds, batch_size=args.batch_size, shuffle=args.do_shuffle)
 
   model = ANN(X_trn.shape[-1], args.hidden_dim).to(device)
-  optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+  optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-  pbar = range(args.epochs)
+  pbar = range(epochs)
   if args.pbar:
     pbar = tqdm(pbar)
   for _ in pbar:
