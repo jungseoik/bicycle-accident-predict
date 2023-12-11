@@ -1,11 +1,21 @@
-cw_basic_lr_result : ±âº»°ª¿¡¼­ lr ¼öÁ¤
-cw_max_lr_epochs_result : ÇöÁØ´Ô ÄÚµå¿¡¼­ lr ¼öÁ¤ ÈÄ °¡Àå ÁÁÀº °ª¿¡¼­ epochs ¼öÁ¤
-cw_max_lr_result : ÇöÁØ´Ô ÄÚµå¿¡¼­ lr ¼öÁ¤
+cw_basic_lr_result : ê¸°ë³¸ê°’ì—ì„œ lr ìˆ˜ì •
 
-cw_basic_lr_result #pick
+cw_basic_lr_epochs_result : ê¸°ë³¸ê°’ì—ì„œ lr ìˆ˜ì •í›„ ê°€ì¥ ì¢‹ì€ ê°’ì—ì„œ epochs ìˆ˜ì •
+
+cw_max_lr_result : í˜„ì¤€ë‹˜ ê°’ì—ì„œ lr ìˆ˜ì •
+
+cw_max_lr_epochs_result : í˜„ì¤€ë‹˜ ì½”ë“œì—ì„œ lr ìˆ˜ì • í›„ ê°€ì¥ ì¢‹ì€ ê°’ì—ì„œ epochs ìˆ˜ì •
+
+
+#pick
+cw_basic_lr_result
  ConfigW4
 
-cw_max_lr_epochs_result #pick
+cw_basic_lr_epochs_result
  ConfigW3
-cw_max_lr_result #pick
+
+cw_max_lr_result
  ConfigW4
+
+cw_max_lr_epochs_result
+ ConfigW3
