@@ -108,20 +108,24 @@ ESTSoft Wassup 1기 첫번째 프로젝트
 - HyperParameters/config.json 을 리스트 형식으로 만듬.
 - layer, lr, epoch, feature 각각에 변화를 주고 그에 따른 결과를 관찰함
 * config.json
-{
-    "input_dim": "feature.shape[1]",
-    "layers": [64, 256, 512, 3],
-    "activations": ["leaky_relu","softplus","selu"],
-    "dropout": 0.2,
-    "lr": 0.0001,
-    "epochs": 200,
-    "batch_size": 256,
-    "criterion" : "nn.CrossEntropyLoss()",
-    "optimizer" : "Adam"
-}
+
+        {
+                "input_dim": "feature.shape[1]",
+                "layers": [64, 256, 512, 3],
+                "activations": ["leaky_relu","softplus","selu"],
+                "dropout": 0.2,
+                "lr": 0.0001,
+                "epochs": 200,
+                "batch_size": 256,
+                "criterion" : "nn.CrossEntropyLoss()",
+                "optimizer" : "Adam"
+        }
 
 ### 5. 최종 모델 선정
-- '사고 위험율을 예측하고 이를 대비하는 것'에 중점을 두었기에 Accuracy와 Precision(정확도와 정밀도)보단 F1_Score와 Recall(재현율)을 평가지표로 삼음. 
-- (class 2에 대한) 이 가장 높은 6번 모델을 선정
+- '사고 위험율을 예측하고 이를 대비하는 것' 에 중점을 두었기에 
+Accuracy와 Precision(정확도와 정밀도)보단 F1_Score와 Recall(재현율)을 평가지표로 삼음. 
+- 평가점수가 가장 높은 class 2의 6번 모델을 선정함.
+class 2 recall : 0.4383057
+class 2 f1_score : 0.3698523
  
-### 6. PPT 작성 및 결과 발표ls
+### 6. PPT 작성 및 결과 발표
