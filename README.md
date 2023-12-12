@@ -129,3 +129,5 @@ class 2 recall : 0.4383057
 class 2 f1_score : 0.3698523
  
 ### 6. PPT 작성 및 결과 발표
+[PPT 발표 링크](https://www.canva.com/design/DAF2EUMGQJo/D8mbuwmtDY1TNUWMI_DxJA/edit?utm_content=DAF2EUMGQJo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
