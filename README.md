@@ -1,7 +1,13 @@
 # est_wassup_02
 ESTSoft Wassup 1기 첫번째 프로젝트
 
-# 필수 참고! 강사님 모델 돌리시는건 seoik폴더에 이거돌리세요.ipynb 돌리시면 최종모델 성능평가 가능합니다.
+### 필수 참고!
+1. seik/QuickStart.ipynb
+2. seik/Xgb,RF,Catb.ipynb
+3. seik/모델6 성능확인.ipynb
+해당 파일들로 빠르게 결과물 확인가능함
+---
+
 
 2조 화이팅~~!!
 
@@ -10,7 +16,6 @@ ESTSoft Wassup 1기 첫번째 프로젝트
 3. 임지혜
 4. 강현준
 5. 황소연
-6. 임준수
 
 * 프로젝트 기간 11/27 ~ 12/13
 ## 1. 프로젝트 목적
