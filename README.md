@@ -73,7 +73,7 @@ ESTSoft Wassup 1기 첫번째 프로젝트
 - 나머지 칼럼들도 데이터 분포가 균등할 필요는 없음
 - Train 데이터에 SMOTE 적용
 
-## 모델 공장
+## 모델 공장(모델학습을 위해 커스텀 모듈을 만들어 사용 해당 내용은 QuickStart.ipynb를 통해 실행가능함)
 ### 1.전처리 : data/base.csv 에서 칼럼을 제거하며 모델의 성능을 파악함
         사용법 : 
         prepro() 함수를 사용함
@@ -148,6 +148,9 @@ Accuracy와 Precision(정확도와 정밀도)보단 F1_Score와 Recall(재현율
 - 평가점수가 가장 높은 class 2의 6번 모델을 선정함.
 class 2 recall : 0.4383057
 class 2 f1_score : 0.3698523
+
+![image](https://github.com/jungseoik/est_wassup_02/assets/92513469/86508a8d-2464-4d1c-bd95-ad5105226f83)
+
 
 ### 해당 모델에 대한 성능지표 선정 데이터는 Result 폴더에 정리되어 있음
 ### 6. PPT 작성 및 결과 발표
