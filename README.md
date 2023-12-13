@@ -34,6 +34,7 @@ ESTSoft Wassup 1기 첫번째 프로젝트
 - 총 데이터량: 32,633
   
 - 데이터 구조
+
 ![image](https://github.com/jungseoik/est_wassup_02/assets/92513469/ba6633e6-b5a2-4d33-8b34-2c654b252362)
 
 - 타겟 데이터 선정
