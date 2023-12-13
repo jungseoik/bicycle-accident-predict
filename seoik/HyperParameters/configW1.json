@@ -1,0 +1,12 @@
+
+{
+    "input_dim": "feature.shape[1]",
+    "layers": [8, 256, 128, 3],
+    "activations": ["relu","relu","relu", "softmax"],
+    "dropout": 0.2,
+    "lr": 0.001,
+    "epochs": 1,
+    "batch_size": 100,
+    "criterion" : "nn.CrossEntropyLoss()",
+    "optimizer" : "Adam"
+}
