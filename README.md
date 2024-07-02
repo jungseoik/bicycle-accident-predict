@@ -1,5 +1,5 @@
-# est_wassup_02
-ESTSoft Wassup 1기 첫번째 프로젝트
+# bicycle-accident-predict problem
+
 
 ### 필수 참고!
 1. seik/QuickStart.ipynb
@@ -9,7 +9,7 @@ ESTSoft Wassup 1기 첫번째 프로젝트
 ---
 
 
-2조 화이팅~~!!
+프로젝트 멤버
 
 1. 정서익
 2. 이채욱
